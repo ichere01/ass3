@@ -55,7 +55,7 @@ app.get('/locations.json', function (request, response) {
   	empty = [];
   	response.send(JSON.stringify(empty));
   }
-}
+});
 
 app.post('/sendlocation', function(request, response) {
 	var login = request.body.login;
