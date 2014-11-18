@@ -24,7 +24,11 @@ app.all('*', function(req, res, next) {
 
 app.get('/', function (request, response) {
   response.set('Content-Type', 'text/html');
-  response.send('<p>ks!</p>');
+  students = db.locations.find();
+  while (students.hasNext()) {
+    print(tojson(students.next()));
+  }
+  //response.send('<p> It works!</p>');
 });
 
 app.post('/sendlocation', function(request, response) {
@@ -38,19 +42,27 @@ app.post('/sendlocation', function(request, response) {
 		"lat": lat,
 		"lng" = lng,
 		"created_at" = created_at,
-	};
-	//CHECK FOR MISSING FIELDS (UNDEFINED)
+		};
 
-	db.collection('locations', function(er, collection) {
-		var id = collection.insert(toInsert, function(err, saved) {
-			if (err) {
-				response.send(500);
-			}
-			else {
-				response.send(200);
-			}
-	    });
-	});
+		//CHECK FOR MISSING FIELDS (UNDEFINED)
+		if (login == UNDEFINED || lat == UNDEFINED || lng == UNDEFINED){
+			response.send("missing info");
+		}
+		else{
+			db.collection('locations', function(er, collection) {
+				var id = collection.insert(toInsert, function(err, saved) {
+					if (err) {
+						response.send(500);
+					}
+					else {
+						characters = [];
+						students = db.locations.find();
+						response.send(JSON.stringify(characers, students));
+						response.send(200);
+					}
+			    });
+			});
+		}
 });
 
 
