@@ -5,7 +5,7 @@ var app = express();
 // Mongo initialization, setting up a connection to a MongoDB  (on Heroku or localhost)
 var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
-  'https://lit-inlet-6760.herokuapp.com/;' 
+  'mongodb://localhost/test'
 var mongo = require('mongodb');
 var db = mongo.Db.connect(mongoUri, function (error, databaseConnection) {
   db = databaseConnection;
