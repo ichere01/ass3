@@ -66,8 +66,8 @@ app.post('/sendlocation', function(request, response) {
 	var toInsert = {
 		"login": login,
 		"lat": lat,
-		"lng" = lng,
-		"created_at" = created_at,
+		"lng": lng,
+		"created_at": created_at,
 		};
 
 		//CHECK FOR MISSING FIELDS (UNDEFINED)
