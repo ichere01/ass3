@@ -4,16 +4,16 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // Mongo initialization, setting up a connection to a MongoDB  (on Heroku or localhost)
-var mongoUri = process.env.MONGOLAB_URI ||
+var mongoUri = process.env.MONGOLAB_URI 
   process.env.MONGOHQ_URL ||
-  'mongodb://localhost/test'
+  'mongodb:localhost/test'
 var mongo = require('mongodb');
 var db = mongo.Db.connect(mongoUri, function (error, databaseConnection) {
   db = databaseConnection;
 });
 
 // Cross domain
-app.use(express.bodyParser());
+app.use(express.bodyParser()
 app.all('*', function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Origin", 'PUT, GET, POST');
@@ -22,14 +22,39 @@ app.all('*', function(req, res, next) {
 });
 
 
-app.get('/', function (request, response) {
-  response.set('Content-Type', 'text/html');
-  students = db.locations.find();
-  while (students.hasNext()) {
-    print(tojson(students.next()));
-  }
-  //response.send('<p> It works!</p>');
+app.get('/', function(request, response) {
+	response.set('Content-Type', 'text/html');
+	var indexPage = '';
+	db.collection('locations', function(er, collection) {
+		collection.find().toArray(function(err, cursor) {
+			if (!err) {
+				indexPage += "<!DOCTYPE HTML><html><head><title>Locations</title></head><body><h1>What Did You Feed Me?</h1>";
+				for (var count = 0; count < cursor.length; count++) {
+					indexPage += "<p>" + cursor[count].fooditem + "</p>";
+				}
+				indexPage += "</body></html>"
+				response.send(indexPage);
+			} else {
+				response.send('<!DOCTYPE HTML><html><head><title>Locations</title></head><body><h1>Whoops, something went terribly wrong!</h1></body></html>');
+			}
+		});
+	});
 });
+
+app.get('/locations.json', function (request, response) {
+  // 
+  response.set('Content-Type', 'text/html');
+  var login = request.body.login; 
+  students = db.locations.find();
+  var documentArray = students.toArray();
+  if(login == UNDEFINED){
+  	response.send(JSON.stringify(characers, students));
+  }
+  else{
+  	empty = [];
+  	response.send(JSON.stringify(empty));
+  }
+}
 
 app.post('/sendlocation', function(request, response) {
 	var login = request.body.login;
@@ -45,7 +70,7 @@ app.post('/sendlocation', function(request, response) {
 		};
 
 		//CHECK FOR MISSING FIELDS (UNDEFINED)
-		if (login == UNDEFINED || lat == UNDEFINED || lng == UNDEFINED){
+		if (login == UNDEFINED || lat == UNDEFINED || lng == UNDEFINED
 			response.send("missing info");
 		}
 		else{
@@ -64,6 +89,22 @@ app.post('/sendlocation', function(request, response) {
 			});
 		}
 });
+app.get('/locations.json', function (request, response) 
+{
+	var request = new XMLHttpRequest();
+  	request.open("get",/redline.json,true);
+    request.onreadystatechange = function (){
+         if(request.readyState == 4 && request.status == 200){
+           data = JSON.parse(request.responsetext);
+           
+         }
+       }
+       request.send();
+  
+}
+
+  
+
 
 
 
