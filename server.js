@@ -1,5 +1,6 @@
 // Express initialization
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 
 // Mongo initialization, setting up a connection to a MongoDB  (on Heroku or localhost)
@@ -11,6 +12,16 @@ var db = mongo.Db.connect(mongoUri, function (error, databaseConnection) {
   db = databaseConnection;
 });
 
+// Cross domain
+app.use(express.bodyParser());
+app.all('*', function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Origin", 'PUT, GET, POST');
+	res.header("Access-Control-Allow-Origin", "X_Requested-With");
+	next();
+});
+
+
 app.get('/', function (request, response) {
   response.set('Content-Type', 'text/html');
   response.send('<p>ks!</p>');
@@ -20,11 +31,13 @@ app.post('/sendlocation', function(request, response) {
 	var login = request.body.login;
 	var lat = request.body.lat;
 	var lng = request.body.lng;
+	var created_at = new Date();
 
 	var toInsert = {
 		"login": login,
 		"lat": lat,
 		"lng" = lng,
+		"created_at" = created_at,
 	};
 	//CHECK FOR MISSING FIELDS (UNDEFINED)
 
