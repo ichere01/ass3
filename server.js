@@ -2,6 +2,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
+// See https://stackoverflow.com/questions/5710358/how-to-get-post-query-in-express-node-js
+app.use(bodyParser.json());
+// See https://stackoverflow.com/questions/25471856/express-throws-error-as-body-parser-deprecated-undefined-extended
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Mongo initialization, setting up a connection to a MongoDB  (on Heroku or localhost)
 var mongoUri = process.env.MONGOLAB_URI 
@@ -13,7 +17,6 @@ var db = mongo.Db.connect(mongoUri, function (error, databaseConnection) {
 });
 
 // Cross domain
-app.use(express.bodyParser()
 app.all('*', function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Origin", 'PUT, GET, POST');
