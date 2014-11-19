@@ -1,7 +1,6 @@
 // Initialization
 var express = require('express');
 var bodyParser = require('body-parser');
-var validator = require('validator'); // See documentation at https://github.com/chriso/validator.js
 var app = express();
 // See https://stackoverflow.com/questions/5710358/how-to-get-post-query-in-express-node-js
 app.use(bodyParser.json());
@@ -11,11 +10,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Mongo initialization
 var mongoUri = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/test';
 var mongo = require('mongodb');
-var db = mongo.Db.connect(mongoUri, function(error, databaseConnection) {
+var db = mongo.Db.connect(mongoUri, function(error, databaseConnection)
+{
 	db = databaseConnection;
 });
 // Cross domain
-app.all('*', function(req, res, next) {
+app.all('*', function(req, res, next) 
+{
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Origin", 'PUT, GET, POST');
 	res.header("Access-Control-Allow-Origin", "X_Requested-With");
@@ -23,41 +24,71 @@ app.all('*', function(req, res, next) {
 });
 
 
-app.get('/', function(request, response) {
+app.get('/', function(request, response) 
+{
 	response.set('Content-Type', 'text/html');
 	var indexPage = '';
-	db.collection('locations', function(er, collection) {
-		collection.find().toArray(function(err, cursor) {
-			if (!err) {
-				indexPage += "<!DOCTYPE HTML><html><head><title>Locations</title></head><body><h1>What Did You Feed Me?</h1>";
-				for (var count = 0; count < cursor.length; count++) {
-					indexPage += "<p>" + cursor[count].fooditem + "</p>";
+	db.collection('locations', function(er, collection) 
+	{
+		collection.find().sort({'created_at': -1 }).toArray(function(err, cursor) 
+		{
+			if (!err)
+			{
+				indexPage += "<!DOCTYPE HTML><html><head><title>Locations</title></head><body><h1>Locations</h1>";
+				for (var count = 0; count < cursor.length; count++) 
+				{
+					indexPage += "<p>" + cursor[count].login + " lat " 
+					+ cursor[count].lat + " lng " +  cursor[count].lat + " created at " + cursor[count].created_at + "</p>";
 				}
-				indexPage += "</body></html>"
+				indexPage += "</body></html>";
 				response.send(indexPage);
-			} else {
+			} 
+			else 
+			{
 				response.send('<!DOCTYPE HTML><html><head><title>Locations</title></head><body><h1>Whoops, something went terribly wrong!</h1></body></html>');
 			}
 		});
 	});
 });
 
-app.get('/locations.json', function (request, response) {
+app.get('/locations.json', function (request, response) 
+{
   // 
-  response.set('Content-Type', 'text/html');
   var login = request.body.login; 
-  students = db.locations.find();
-  var documentArray = students.toArray();
-  if(login == UNDEFINED){
-  	response.send(JSON.stringify(characers, students));
-  }
-  else{
-  	empty = [];
-  	response.send(JSON.stringify(empty));
-  }
+  console.log(login);
+  db.collection('locations', function(er, collection) 
+  {
+		collection.find({"login": login}).sort({'created_at': -1 }).toArray(function(err, cursor)
+		{
+			if (!err) 
+			{
+				 if(login == undefined)
+				 {
+				 	characters = [];
+  					response.send(JSON.stringify(characters, cursor));
+  				 }
+  				 else
+  				 {
+  					empty = [];
+  					response.send(JSON.stringify(empty));
+ 				 }
+			}	
+			else 
+			{
+				response.send('Something is terribly the matter');
+			}
+		});
+  });
+  // students = db.locations.find({"login": login}).sort({'created_at': -1 });
+  // var documentArray = students.toArray();
+  // if(login == UNDEFINED){
+  // 	response.send(JSON.stringify(characers, students));
+  // }
+  
 });
 
-app.post('/sendlocation', function(request, response) {
+app.post('/sendlocation', function(request, response) 
+{
 	var login = request.body.login;
 	var lat = request.body.lat;
 	var lng = request.body.lng;
@@ -71,16 +102,21 @@ app.post('/sendlocation', function(request, response) {
 		};
 
 		//CHECK FOR MISSING FIELDS (UNDEFINED)
-		if (login == UNDEFINED || lat == UNDEFINED || lng == UNDEFINED
+		if (login == undefined || lat == undefined || lng == undefined)
+		{
 			response.send("missing info");
 		}
 		else{
-			db.collection('locations', function(er, collection) {
-				var id = collection.insert(toInsert, function(err, saved) {
-					if (err) {
+			db.collection('locations', function(er, collection) 
+			{
+				var id = collection.insert(toInsert, function(err, saved) 
+				{
+					if (err) 
+					{
 						response.send(500);
 					}
-					else {
+					else 
+					{
 						characters = [];
 						students = db.locations.find();
 						response.send(JSON.stringify(characers, students));
@@ -93,16 +129,17 @@ app.post('/sendlocation', function(request, response) {
 app.get('/locations.json', function (request, response) 
 {
 	var request = new XMLHttpRequest();
-  	request.open("get",/redline.json,true);
-    request.onreadystatechange = function (){
+  	request.open("get","https://lit-inlet-6760.herokuapp.com/redline.json",true);
+    request.onreadystatechange = function ()
+    {
          if(request.readyState == 4 && request.status == 200){
            data = JSON.parse(request.responsetext);
            
          }
-       }
+    }
        request.send();
   
-}
+});
 
   
 
